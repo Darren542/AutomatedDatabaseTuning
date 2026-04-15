@@ -1,0 +1,17 @@
+[project]
+name = "autotuner-recommender"
+version = "0.1.0"
+description = "POC recommender: candidate generation + scoring for index recommendations"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "pyodbc>=5.0.0",
+  "python-dotenv>=1.0.0",
+  "pandas>=2.0.0"
+]
+
+[project.scripts]
+autotuner-recommender = "recommender.main:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

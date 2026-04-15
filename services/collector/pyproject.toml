@@ -1,0 +1,16 @@
+[project]
+name = "autotuner-collector"
+version = "0.1.0"
+description = "POC telemetry collector for SQL Server Query Store + DMVs"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "pyodbc>=5.0.0",
+  "python-dotenv>=1.0.0"
+]
+
+[project.scripts]
+autotuner-collector = "collector.main:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

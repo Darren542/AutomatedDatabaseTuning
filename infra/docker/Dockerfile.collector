@@ -1,0 +1,10 @@
+FROM python:3.12-slim
+
+WORKDIR /app
+COPY services/collector/pyproject.toml /app/services/collector/pyproject.toml
+COPY services/collector/src /app/services/collector/src
+COPY services/collector/README.md /app/services/collector/README.md
+
+RUN pip install --no-cache-dir -e /app/services/collector
+
+CMD ["autotuner-collector"]

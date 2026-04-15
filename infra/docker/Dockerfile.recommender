@@ -1,0 +1,10 @@
+FROM python:3.12-slim
+
+WORKDIR /app
+COPY services/recommender/pyproject.toml /app/services/recommender/pyproject.toml
+COPY services/recommender/src /app/services/recommender/src
+COPY services/recommender/README.md /app/services/recommender/README.md
+
+RUN pip install --no-cache-dir -e /app/services/recommender
+
+CMD ["autotuner-recommender"]
