@@ -17,6 +17,7 @@ jobs:
       - name: Install
         working-directory: dashboard/web
         run: npm ci
+        # run: npm install # if we don't want to save package-lock.json
       - name: Build
         working-directory: dashboard/web
         run: npm run build
