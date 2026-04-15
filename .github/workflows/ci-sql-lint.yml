@@ -1,0 +1,20 @@
+name: CI (SQL basic)
+
+on:
+  pull_request:
+    paths:
+      - "sql/**"
+      - ".github/workflows/ci-sql-lint.yml"
+
+jobs:
+  sql-basic:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Basic validation
+        run: |
+          echo "Running basic checks (file presence)."
+          test -f sql/setup/enable_query_store.sql
+          test -f sql/schema/01_schema.sql
+          test -f sql/workloads/read_heavy.sql
+          test -f sql/workloads/write_heavy.sql

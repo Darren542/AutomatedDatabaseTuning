@@ -1,0 +1,27 @@
+name: CI (Python)
+
+on:
+  pull_request:
+    paths:
+      - "services/**"
+      - ".github/workflows/ci-python.yml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [collector, recommender]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e services/${{ matrix.service }}
+          pip install pytest
+      - name: Test
+        run: |
+          pytest -q services/${{ matrix.service }}/tests
