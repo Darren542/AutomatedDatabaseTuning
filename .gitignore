@@ -298,7 +298,7 @@ build/
 .venv/
 venv/
 .env
-.env.*
+#  .env.* # Examples env should be kept.
 pip-wheel-metadata/
 .pytest_cache/
 .mypy_cache/
