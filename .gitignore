@@ -273,3 +273,66 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+# ======================
+# OS / Editor
+# ======================
+.DS_Store
+Thumbs.db
+
+.vscode/
+.idea/
+*.iml
+
+# ======================
+# Python
+# ======================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+.env
+.env.*
+pip-wheel-metadata/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+coverage*
+htmlcov/
+.cache/
+
+# ======================
+# Node / React
+# ======================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+dist/
+build/
+.vite/
+
+# ======================
+# .NET (if added later)
+# ======================
+bin/
+obj/
+
+# ======================
+# SQL / DB artifacts
+# ======================
+*.bak
+*.mdf
+*.ldf
+
+# ======================
+# Reports / local outputs
+# ======================
+reports/out/
