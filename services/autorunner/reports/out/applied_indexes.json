@@ -1,0 +1,8 @@
+[
+  {
+    "index_name": "IX_POC_Orders_OrderDate",
+    "schema_name": "Sales",
+    "table_name": "Orders",
+    "create_sql": "CREATE NONCLUSTERED INDEX [IX_POC_Orders_OrderDate]\nON [Sales].[Orders] ([OrderDate])\nINCLUDE ([CustomerID], [SalespersonPersonID]);"
+  }
+]

@@ -53,7 +53,8 @@ BEGIN
 
         DECLARE @NewOrders TABLE
         (
-            OrderID INT PRIMARY KEY
+            OrderID INT NOT NULL PRIMARY KEY,
+            RowNum INT NOT NULL
         );
 
         ;WITH n AS
@@ -62,8 +63,15 @@ BEGIN
                 ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS rn
             FROM sys.all_objects
         )
+        INSERT INTO @NewOrders (OrderID, RowNum)
+        SELECT
+            NEXT VALUE FOR [Sequences].[OrderID],
+            rn
+        FROM n;
+
         INSERT INTO Sales.Orders
         (
+            OrderID,
             CustomerID,
             SalespersonPersonID,
             PickedByPersonID,
@@ -79,23 +87,23 @@ BEGIN
             PickingCompletedWhen,
             LastEditedBy
         )
-        OUTPUT inserted.OrderID INTO @NewOrders(OrderID)
         SELECT
+            no.OrderID,
             @CustomerID,
             @SalespersonPersonID,
             NULL,
             @ContactPersonID,
             NULL,
-            DATEADD(DAY, -(rn % 7), @BaseOrderDate),
-            DATEADD(DAY, 1 + (rn % 7), @BaseOrderDate),
-            CONCAT(N'POC-', @i, N'-', rn),
+            DATEADD(DAY, -(no.RowNum % 7), @BaseOrderDate),
+            DATEADD(DAY, 1 + (no.RowNum % 7), @BaseOrderDate),
+            CONCAT(N'POC-', @i, N'-', no.RowNum),
             0,
             N'POC write-heavy workload order',
             N'POC delivery instructions',
             N'POC internal comments',
             NULL,
             @LastEditedBy
-        FROM n;
+        FROM @NewOrders AS no;
 
         ;WITH StockSample AS
         (
@@ -124,27 +132,24 @@ BEGIN
             LastEditedBy
         )
         SELECT
-            o.OrderID,
+            no.OrderID,
             s.StockItemID,
             s.StockItemName,
             s.UnitPackageID,
-            1 + ((o.OrderID + s.rn) % 10),
+            1 + ((no.OrderID + s.rn) % 10),
             s.UnitPrice,
             s.TaxRate,
             0,
             NULL,
             @LastEditedBy
-        FROM @NewOrders AS o
+        FROM @NewOrders AS no
         CROSS JOIN StockSample AS s;
 
-        ----------------------------------------------------------------------
-        -- Update a subset of the newly inserted orders
-        ----------------------------------------------------------------------
         ;WITH TargetOrders AS
         (
-            SELECT TOP (10) n.OrderID
-            FROM @NewOrders AS n
-            ORDER BY n.OrderID
+            SELECT TOP (10) no.OrderID
+            FROM @NewOrders AS no
+            ORDER BY no.OrderID
         )
         UPDATE o
         SET
@@ -155,15 +160,12 @@ BEGIN
         INNER JOIN TargetOrders AS t
             ON t.OrderID = o.OrderID;
 
-        ----------------------------------------------------------------------
-        -- Update a subset of the newly inserted order lines
-        ----------------------------------------------------------------------
         ;WITH TargetLines AS
         (
             SELECT TOP (30) ol.OrderLineID
             FROM Sales.OrderLines AS ol
-            INNER JOIN @NewOrders AS n
-                ON n.OrderID = ol.OrderID
+            INNER JOIN @NewOrders AS no
+                ON no.OrderID = ol.OrderID
             ORDER BY ol.OrderLineID
         )
         UPDATE ol
@@ -183,14 +185,11 @@ BEGIN
         INNER JOIN TargetLines AS t
             ON t.OrderLineID = ol.OrderLineID;
 
-        ----------------------------------------------------------------------
-        -- Delete a small subset to create delete pressure
-        ----------------------------------------------------------------------
         ;WITH DoomedOrders AS
         (
-            SELECT TOP (5) n.OrderID
-            FROM @NewOrders AS n
-            ORDER BY n.OrderID DESC
+            SELECT TOP (5) no.OrderID
+            FROM @NewOrders AS no
+            ORDER BY no.OrderID DESC
         )
         DELETE ol
         FROM Sales.OrderLines AS ol
@@ -199,9 +198,9 @@ BEGIN
 
         ;WITH DoomedOrders AS
         (
-            SELECT TOP (5) n.OrderID
-            FROM @NewOrders AS n
-            ORDER BY n.OrderID DESC
+            SELECT TOP (5) no.OrderID
+            FROM @NewOrders AS no
+            ORDER BY no.OrderID DESC
         )
         DELETE o
         FROM Sales.Orders AS o
