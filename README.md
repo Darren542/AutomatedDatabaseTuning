@@ -80,3 +80,6 @@ This repository is a **proof-of-concept** for an automated tuning loop on **SQL 
       ├─ ci-python.yml
       ├─ ci-react.yml
       └─ ci-sql-lint.yml
+## Full implementation foundation
+
+The new API starts independently of the preserved SQL prototype. See [Local development](docs/LOCAL_DEVELOPMENT.md) for current startup commands and [Application structure](docs/APPLICATION_STRUCTURE.md) for component ownership and migration boundaries. The earlier quick-start section describes the legacy scaffold.
