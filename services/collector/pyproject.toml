@@ -1,7 +1,11 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "autotuner-collector"
 version = "0.1.0"
-description = "POC telemetry collector for SQL Server Query Store + DMVs"
+description = "SQL Server target validation and workload collection"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
@@ -9,8 +13,15 @@ dependencies = [
   "python-dotenv>=1.0.0"
 ]
 
+[project.optional-dependencies]
+dev = ["pytest>=8,<9"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
 [project.scripts]
 autotuner-collector = "collector.main:main"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+addopts = "--import-mode=importlib"

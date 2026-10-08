@@ -46,3 +46,7 @@ The original runner remains separate and requires the configured SQL Server test
 ```
 
 Consult the autorunner README and database-specific setup scripts before running an experiment. The demo can clear Query Store and apply/drop indexes; starting the new API does none of those operations. Existing Compose files are prototype scaffolding and do not launch the new API.
+
+## FR-01 collector validation
+
+Install the backend validation package with `.\.venv\Scripts\python.exe -m pip install -e "services/collector[dev]"`. See [Target validation](TARGET_VALIDATION.md) for tests and an optional manual database connection check. The API still only exposes its health endpoint.
