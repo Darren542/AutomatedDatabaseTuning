@@ -12,7 +12,7 @@ Sprint 1 begins by adding an HTTP application around the existing SQL/Python pro
 | `services/autorunner` | Interactive prototype experiment entry point | Preserved |
 | `sql/shared` | Reusable capture, comparison, and candidate SQL | Prototype SQL retained |
 | `sql/databases` | Database-specific setup, fixtures, and workloads | Prototype SQL retained |
-| `dashboard/web` | React presentation and HTTP client | Existing skeleton |
+| `dashboard/web` | React presentation and HTTP client | Target form and Test Connection implemented |
 | `infra` and `.github` | Deployment scaffolding and CI | Existing scaffolding; separate backlog tasks |
 
 ## Boundaries for upcoming work
@@ -37,4 +37,4 @@ Deferred: FR-01 target registration, SQL connectivity, persistence/migrations, b
 
 ## FR-01 progress
 
-The collector now owns immutable target metadata, transient SQL credentials, and a read-only connection-validation service. See [Target validation](TARGET_VALIDATION.md). The Test Connection API is implemented. Target save/list/select APIs, persistence, and UI remain pending.
+The collector now owns immutable target metadata, transient SQL credentials, and a read-only connection-validation service. See [Target validation](TARGET_VALIDATION.md). The Test Connection API is implemented. Target form and Test Connection UI are implemented. Target save/list/select APIs and persistence remain pending.

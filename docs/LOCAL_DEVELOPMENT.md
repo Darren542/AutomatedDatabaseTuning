@@ -34,7 +34,7 @@ npm ci
 npm run dev
 ```
 
-Use the URL printed by Vite. The dashboard remains a skeleton and does not call the API yet.
+Use the URL printed by Vite. The dashboard now provides target configuration and Test Connection. Start the API as above, use `localhost\SQLEXPRESS` / `WideWorldImporters`, and enable certificate trust for the local demo. See [Dashboard instructions](../dashboard/web/README.md).
 
 ## Preserved SQL prototype
 
