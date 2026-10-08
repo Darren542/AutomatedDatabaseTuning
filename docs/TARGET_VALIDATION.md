@@ -53,6 +53,6 @@ For SQL authentication, construct the target with `authentication="sql"` and sup
 
 ## Remaining FR-01 work
 
-Target API endpoints, save/revalidation rules, credential references, persistence, target selector, form, and Test Connection UI are still to be implemented. Query Store and collector-specific permission checks belong to FR-02; this validation only establishes access to the selected database.
+The Test Connection endpoint is implemented; see [Target API](TARGET_API.md). Save/list/select API endpoints, save/revalidation rules, credential references, persistence, target selector, form, and Test Connection UI are still to be implemented. Query Store and collector-specific permission checks belong to FR-02; this validation only establishes access to the selected database.
 
 Implementation references: [Microsoft ODBC options](https://learn.microsoft.com/en-us/sql/connect/odbc/dsn-connection-string-attribute) and [pyodbc connection lifecycle and query timeout](https://github.com/mkleehammer/pyodbc/wiki/Connection).

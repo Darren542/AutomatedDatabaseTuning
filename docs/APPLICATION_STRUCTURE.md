@@ -6,7 +6,7 @@ Sprint 1 begins by adding an HTTP application around the existing SQL/Python pro
 
 | Location | Responsibility | Current state |
 | --- | --- | --- |
-| `services/api/src/autotuner_api` | Application composition, startup settings, versioned HTTP routes | Health endpoint implemented |
+| `services/api/src/autotuner_api` | Application composition, startup settings, versioned HTTP routes | Health and target Test Connection endpoints implemented |
 | `services/collector` | Target connection checks and telemetry collection | FR-01 target model and connection validation implemented; telemetry remains FR-02 |
 | `services/recommender` | Candidate generation and scoring; later forecasting integration | Existing placeholder |
 | `services/autorunner` | Interactive prototype experiment entry point | Preserved |
@@ -37,4 +37,4 @@ Deferred: FR-01 target registration, SQL connectivity, persistence/migrations, b
 
 ## FR-01 progress
 
-The collector now owns immutable target metadata, transient SQL credentials, and a read-only connection-validation service. See [Target validation](TARGET_VALIDATION.md). Target registration APIs, persistence, and UI remain pending.
+The collector now owns immutable target metadata, transient SQL credentials, and a read-only connection-validation service. See [Target validation](TARGET_VALIDATION.md). The Test Connection API is implemented. Target save/list/select APIs, persistence, and UI remain pending.

@@ -6,7 +6,7 @@ Run the commands below in PowerShell from the repository root. Python 3.10 or ne
 
 ```powershell
 python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -e "services/api[dev]"
+.\.venv\Scripts\python.exe -m pip install -e "services/collector[dev]" -e "services/api[dev]"
 # Optional: copy only if .env does not already exist.
 if (-not (Test-Path .env)) { Copy-Item .env.example .env }
 .\.venv\Scripts\python.exe -m autotuner_api
@@ -49,4 +49,4 @@ Consult the autorunner README and database-specific setup scripts before running
 
 ## FR-01 collector validation
 
-Install the backend validation package with `.\.venv\Scripts\python.exe -m pip install -e "services/collector[dev]"`. See [Target validation](TARGET_VALIDATION.md) for tests and an optional manual database connection check. The API still only exposes its health endpoint.
+Install the backend validation package with `.\.venv\Scripts\python.exe -m pip install -e "services/collector[dev]"`. See [Target validation](TARGET_VALIDATION.md) for tests and an optional manual database connection check. The API exposes health and Test Connection endpoints. See [Target API](TARGET_API.md) for the HTTP check.
