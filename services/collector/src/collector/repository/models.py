@@ -1,14 +1,9 @@
-"""Repository records. These are persistence/domain objects, not HTTP DTOs."""
-
 from __future__ import annotations
-
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 from uuid import UUID
-
 from collector.targets import TargetConfiguration
-
 
 class CollectionBatchStatus(str, Enum):
     PENDING = "Pending"
@@ -17,7 +12,6 @@ class CollectionBatchStatus(str, Enum):
     PARTIAL = "Partial"
     FAILED = "Failed"
     CANCELLED = "Cancelled"
-
 
 @dataclass(frozen=True)
 class TargetRecord:
@@ -28,7 +22,6 @@ class TargetRecord:
     created_at_utc: datetime
     updated_at_utc: datetime
 
-
 @dataclass(frozen=True)
 class CollectionBatchRecord:
     batch_id: UUID
@@ -36,6 +29,10 @@ class CollectionBatchRecord:
     label: str | None
     requested_window_start_utc: datetime | None
     requested_window_end_utc: datetime | None
+    effective_window_start_utc: datetime | None
+    effective_window_end_utc: datetime | None
+    window_source: str | None
+    force_metadata: bool
     collection_started_at_utc: datetime | None
     collection_completed_at_utc: datetime | None
     status: CollectionBatchStatus

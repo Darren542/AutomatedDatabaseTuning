@@ -1,7 +1,4 @@
-"""WC-02 collection-batch orchestration."""
-
 from __future__ import annotations
-
 from datetime import datetime
 from uuid import UUID
 
@@ -9,10 +6,8 @@ from collector.repository.collection_batches import SqlCollectionBatchRepository
 from collector.repository.models import CollectionBatchRecord, CollectionBatchStatus
 from collector.repository.targets import SqlTargetRepository
 
-
 class TargetUnavailableError(ValueError):
     pass
-
 
 class CollectionCoordinator:
     def __init__(
@@ -32,6 +27,7 @@ class CollectionCoordinator:
         label: str | None = None,
         requested_window_start_utc: datetime | None = None,
         requested_window_end_utc: datetime | None = None,
+        force_metadata: bool = False,
     ) -> CollectionBatchRecord:
         target = self._targets.get(target_id)
         if target is None:
@@ -45,6 +41,7 @@ class CollectionCoordinator:
             requested_window_start_utc=requested_window_start_utc,
             requested_window_end_utc=requested_window_end_utc,
             collector_version=self._collector_version,
+            force_metadata=force_metadata,
         )
 
     def start(self, batch_id: UUID) -> CollectionBatchRecord:
