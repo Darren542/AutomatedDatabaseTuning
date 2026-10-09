@@ -30,7 +30,7 @@ class TargetConfiguration:
     encrypt: bool = True
     trust_server_certificate: bool = False
     connection_timeout_seconds: int = 5
-    query_timeout_seconds: int = 5
+    query_timeout_seconds: int = 30
 
     def __post_init__(self) -> None:
         for name in ("name", "server", "database", "driver"):

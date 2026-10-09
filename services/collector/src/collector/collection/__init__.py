@@ -1,5 +1,3 @@
-"""Collection orchestration. Readers report evidence; they do not score or tune."""
+from collector.collection.runner import CollectionRunResult, CollectionRunner
 
-from .coordinator import CollectionCoordinator
-
-__all__ = ["CollectionCoordinator"]
+__all__ = ["CollectionRunner", "CollectionRunResult"]

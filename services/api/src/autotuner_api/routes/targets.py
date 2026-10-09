@@ -49,7 +49,7 @@ class TargetConfigurationRequest(BaseModel):
     encrypt: bool = True
     trust_server_certificate: bool = False
     connection_timeout_seconds: int = Field(default=5, ge=1, le=60)
-    query_timeout_seconds: int = Field(default=5, ge=1, le=60)
+    query_timeout_seconds: int = Field(default=30, ge=1, le=60)
 
 
 class TestConnectionRequest(TargetConfigurationRequest):
