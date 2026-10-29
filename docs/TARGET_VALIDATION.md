@@ -56,3 +56,10 @@ For SQL authentication, construct the target with `authentication="sql"` and sup
 The Test Connection endpoint is implemented; see [Target API](TARGET_API.md). Save/list/select API endpoints, save/revalidation rules, credential references, persistence, target selector, form, and Test Connection UI are still to be implemented. Query Store and collector-specific permission checks belong to FR-02; this validation only establishes access to the selected database.
 
 Implementation references: [Microsoft ODBC options](https://learn.microsoft.com/en-us/sql/connect/odbc/dsn-connection-string-attribute) and [pyodbc connection lifecycle and query timeout](https://github.com/mkleehammer/pyodbc/wiki/Connection).
+
+
+## Elevated-permission connections
+
+Excessive ALTER/DDL permissions are a warning rather than a collector-readiness failure. Connectivity and all required telemetry reads must still pass. Target setup displays an acknowledgement checkbox before Save target is enabled. Changing the configuration or retesting clears the acknowledgement.
+
+Saving revalidates the actual server-side credential reference. If that account has elevated permissions, POST /api/v1/targets requires `acknowledge_excessive_permissions: true`; otherwise it returns HTTP 428. This also handles a restricted test account paired with a more privileged saved reference. Acknowledgement never bypasses failed connectivity or missing read permissions. It is not persisted as a database field, and no SQL migration is required. Saved-target access tests continue to report the permission warning.

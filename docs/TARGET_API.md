@@ -55,3 +55,10 @@ This endpoint remains a local development API without user authentication. Save/
 ```
 
 Tests cover HTTP-to-service mapping, Windows/SQL authentication, invalid settings, malformed JSON, credential non-disclosure, and failed connection results. They use a test service; the manual command above verifies the real SQL Server path.
+
+
+## Elevated-permission connections
+
+Excessive ALTER/DDL permissions are a warning rather than a collector-readiness failure. Connectivity and all required telemetry reads must still pass. Target setup displays an acknowledgement checkbox before Save target is enabled. Changing the configuration or retesting clears the acknowledgement.
+
+Saving revalidates the actual server-side credential reference. If that account has elevated permissions, POST /api/v1/targets requires `acknowledge_excessive_permissions: true`; otherwise it returns HTTP 428. This also handles a restricted test account paired with a more privileged saved reference. Acknowledgement never bypasses failed connectivity or missing read permissions. It is not persisted as a database field, and no SQL migration is required. Saved-target access tests continue to report the permission warning.

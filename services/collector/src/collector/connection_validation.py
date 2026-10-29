@@ -52,7 +52,6 @@ class ConnectionValidationResult:
             and self.query_store_readable
             and self.index_usage_readable
             and self.metadata_readable
-            and self.ddl_restricted
             and self.source_state_readable
             and self.index_operational_readable
             and self.missing_indexes_readable
@@ -259,8 +258,8 @@ class ConnectionValidationService:
                     ValidationCode.EXCESSIVE_PERMISSIONS,
                     (
                         "Database connection and telemetry reads succeeded, but the "
-                        "collector account has ALTER permission. Use a lower-privilege "
-                        "collector credential."
+                        "account has ALTER permission. A restricted account is recommended; "
+                        "acknowledge the warning to save this target."
                     ),
                     database_connected=True,
                     query_store_readable=True,

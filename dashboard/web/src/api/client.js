@@ -1,4 +1,4 @@
-export async function request(path, { method = 'GET', body, signal } = {}) {
+export async function request(path, { method = 'GET', body, signal, errors = {} } = {}) {
   let response
   try {
     response = await fetch(`/api/v1${path}`, {
@@ -16,9 +16,9 @@ export async function request(path, { method = 'GET', body, signal } = {}) {
       422: 'Check the configuration, credentials reference, permissions, and date range. The target must be collector-ready before it can be saved.',
       503: 'The repository is unavailable. Check its configuration and apply the repository SQL migrations.',
     }
-    throw new Error(messages[response.status] || 'The API could not complete this request. Refresh to inspect the saved state.')
+    throw Object.assign(new Error(errors[response.status] || messages[response.status] || 'The API could not complete this request. Refresh to inspect the saved state.'), { status: response.status })
   }
-  try { return await response.json() } catch { throw new Error('The API returned an unreadable response.') }
+  try { return await response.json() } catch (error) { if (error.name === 'AbortError') throw error; throw new Error('The API returned an unreadable response.') }
 }
 
 export function utcDate(value) {

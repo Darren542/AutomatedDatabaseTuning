@@ -8,7 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "lint": "echo \"(add eslint later)\"",
-    "test": "node --test src/api/targets.test.js src/api/client.test.js"
+    "test": "node --test src/api/targets.test.js src/api/client.test.js src/api/recommendations.test.js"
   },
   "dependencies": {
     "react": "^18.3.1",

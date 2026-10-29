@@ -1,0 +1,11 @@
+{
+  "database": "AutoTuner_Sprint2_Demo_20261028_1",
+  "analysis_id": "f26c58d3-6ae0-4255-b0f8-a19ea621bc70",
+  "checks": {
+    "FR-04": "CREATE with keys/includes/source evidence",
+    "FR-05": "Read-heavy candidate ranks above write-heavy candidate",
+    "FR-06": "SQL/rationale/query evidence/score persisted and reopened",
+    "FR-10": "DROP/RETAIN advice and protected-index safety",
+    "API": "Missing collection 404; incomplete collection 422; fresh app reload persisted result"
+  }
+}

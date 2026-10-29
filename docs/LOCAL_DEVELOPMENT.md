@@ -6,7 +6,7 @@ Run the commands below in PowerShell from the repository root. Python 3.10 or ne
 
 ```powershell
 python -m venv services/collector/.venv
-services\collector\.venv\Scripts\python.exe -m pip install -e "services/collector[dev]" -e "services/api[dev]"
+services\collector\.venv\Scripts\python.exe -m pip install -e "services/collector[dev]" -e "services/recommender[dev]" -e "services/api[dev]"
 # Optional: copy only if .env does not already exist.
 if (-not (Test-Path .env)) { Copy-Item .env.example .env }
 services\collector\.venv\Scripts\python.exe -m autotuner_api
@@ -54,3 +54,11 @@ Install the backend validation package with `services\collector\.venv\Scripts\py
 ## Full project workspace
 
 See [Project frontend and collector completion](PROJECT_FRONTEND.md) for repository migration 004, the complete UI, and collector recovery.
+
+## Sprint 2 recommendations
+
+See [recommendation setup and migration 005](SPRINT_2_IMPLEMENTATION.md) and the [acceptance demonstration](SPRINT_2_ACCEPTANCE.md). Install the recommender together with collector/API as shown above.
+
+## Separate discovery/scoring and workload simulation
+
+Apply repository migration 006 before using this version. See [workflow, cleanup and simulator setup](WORKFLOW_AND_SIMULATOR.md). Simulated writes require the separate TunerSim sandbox SQL in a disposable target database.

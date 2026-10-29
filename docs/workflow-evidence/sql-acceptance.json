@@ -1,0 +1,431 @@
+{
+  "frozen_scoring": {
+    "candidate_set_id": "ad00b827-d1bc-45d7-b4ad-a7666d99b698",
+    "analysis_ids": [
+      "ea5c1879-44e9-40a9-b241-28b39b12bf80",
+      "7902a23c-bc4b-4f79-99d6-6869b114410b"
+    ],
+    "input_hash": "bc434753a379a7fe0eb6663703ceb905c6d6a2df3eb7f43337c6cca02397adc7"
+  },
+  "cleanup": {
+    "shared_query_rows_retained": true,
+    "deleted": {
+      "deleted": true,
+      "counts": {
+        "CollectionSourceState": 1,
+        "CollectionComponentResult": 6,
+        "IndexUsageObservation": 6,
+        "IndexOperationalObservation": 0,
+        "MissingIndexObservation": 2,
+        "TableMetadataSnapshot": 2,
+        "ColumnMetadataSnapshot": 8,
+        "IndexMetadataSnapshot": 6,
+        "IndexColumnMetadataSnapshot": 6,
+        "ConstraintMetadataSnapshot": 0,
+        "query_memberships": 2,
+        "query_rows_to_remove": 0,
+        "collections": 1,
+        "candidate_sets": 1,
+        "analyses": 1,
+        "simulation_runs": 0,
+        "targets": 0
+      }
+    }
+  },
+  "observed_candidate_keys": [
+    [
+      "ProductId",
+      "Status"
+    ],
+    [
+      "CustomerId",
+      "Status"
+    ]
+  ],
+  "simulator": {
+    "run_id": "61a5b481-a491-491d-ab71-815d4eb96fd2",
+    "target_id": "836a1664-54d3-f111-990a-44e517fe2544",
+    "status": "Stopped",
+    "config": {
+      "target_id": "836a1664-54d3-f111-990a-44e517fe2544",
+      "label": "SQL acceptance traffic",
+      "seed": 42,
+      "concurrency": 2,
+      "max_requests": 500,
+      "max_writes": 5,
+      "allow_writes": true,
+      "collect_every_seconds": 30,
+      "auto_collect": true,
+      "auto_score": true,
+      "phases": [
+        {
+          "name": "Customer reads",
+          "duration_seconds": 50,
+          "requests_per_second": 5.0,
+          "customer_read": 100.0,
+          "product_read": 0.0,
+          "insert": 0.0,
+          "update": 0.0,
+          "hot_key_percent": 80.0,
+          "hot_customer_id": 1,
+          "hot_product_id": 1
+        }
+      ]
+    },
+    "stats": {
+      "scheduled": 179,
+      "submitted": 139,
+      "completed": 139,
+      "failed": 0,
+      "dropped": 40,
+      "write_attempts": 5,
+      "rows_written": 5,
+      "latency_total_ms": 801.9999978132546,
+      "elapsed_seconds": 37.06,
+      "phase": "Live write/product shift",
+      "by_template": {
+        "customer_read": 17,
+        "product_read": 117,
+        "update": 2,
+        "insert": 3
+      },
+      "collections": [
+        {
+          "batch_id": "876a1664-54d3-f111-990a-44e517fe2544",
+          "status": "Completed",
+          "candidate_set_id": "a16ccc43-d1c9-40c3-af25-08ba36cf851d",
+          "analysis_id": "51b64611-53c2-49e8-abca-6002a36f5d2d"
+        },
+        {
+          "batch_id": "8b565a76-54d3-f111-990a-44e517fe2544",
+          "status": "Completed",
+          "candidate_set_id": "1804b86c-2182-41f8-b91b-bc75c8181f09",
+          "analysis_id": "bec7aecb-c9c0-431d-aaf8-3e20f6eb37b9"
+        }
+      ],
+      "samples": [
+        {
+          "elapsed_seconds": 0.0,
+          "phase": "Customer reads",
+          "completed": 0,
+          "achieved_rps": 0.0,
+          "configured_rps": 5.0,
+          "dropped": 0
+        },
+        {
+          "elapsed_seconds": 1.06,
+          "phase": "Customer reads",
+          "completed": 6,
+          "achieved_rps": 5.64,
+          "configured_rps": 5.0,
+          "dropped": 0
+        },
+        {
+          "elapsed_seconds": 2.08,
+          "phase": "Customer reads",
+          "completed": 13,
+          "achieved_rps": 6.9,
+          "configured_rps": 5.0,
+          "dropped": 0
+        },
+        {
+          "elapsed_seconds": 3.09,
+          "phase": "Live write/product shift",
+          "completed": 17,
+          "achieved_rps": 3.94,
+          "configured_rps": 5.0,
+          "dropped": 0
+        },
+        {
+          "elapsed_seconds": 4.09,
+          "phase": "Live write/product shift",
+          "completed": 23,
+          "achieved_rps": 6.0,
+          "configured_rps": 5.0,
+          "dropped": 0
+        },
+        {
+          "elapsed_seconds": 5.19,
+          "phase": "Live write/product shift",
+          "completed": 29,
+          "achieved_rps": 5.48,
+          "configured_rps": 5.0,
+          "dropped": 0
+        },
+        {
+          "elapsed_seconds": 6.24,
+          "phase": "Live write/product shift",
+          "completed": 34,
+          "achieved_rps": 4.78,
+          "configured_rps": 5.0,
+          "dropped": 0
+        },
+        {
+          "elapsed_seconds": 7.34,
+          "phase": "Live write/product shift",
+          "completed": 37,
+          "achieved_rps": 2.71,
+          "configured_rps": 5.0,
+          "dropped": 0
+        },
+        {
+          "elapsed_seconds": 8.42,
+          "phase": "Live write/product shift",
+          "completed": 42,
+          "achieved_rps": 4.64,
+          "configured_rps": 5.0,
+          "dropped": 0
+        },
+        {
+          "elapsed_seconds": 9.42,
+          "phase": "Live write/product shift",
+          "completed": 46,
+          "achieved_rps": 4.0,
+          "configured_rps": 5.0,
+          "dropped": 1
+        },
+        {
+          "elapsed_seconds": 10.45,
+          "phase": "Live write/product shift",
+          "completed": 48,
+          "achieved_rps": 1.94,
+          "configured_rps": 5.0,
+          "dropped": 5
+        },
+        {
+          "elapsed_seconds": 11.45,
+          "phase": "Live write/product shift",
+          "completed": 51,
+          "achieved_rps": 3.0,
+          "configured_rps": 5.0,
+          "dropped": 7
+        },
+        {
+          "elapsed_seconds": 12.55,
+          "phase": "Live write/product shift",
+          "completed": 54,
+          "achieved_rps": 2.74,
+          "configured_rps": 5.0,
+          "dropped": 7
+        },
+        {
+          "elapsed_seconds": 13.61,
+          "phase": "Live write/product shift",
+          "completed": 58,
+          "achieved_rps": 3.76,
+          "configured_rps": 5.0,
+          "dropped": 10
+        },
+        {
+          "elapsed_seconds": 14.72,
+          "phase": "Live write/product shift",
+          "completed": 64,
+          "achieved_rps": 5.41,
+          "configured_rps": 5.0,
+          "dropped": 11
+        },
+        {
+          "elapsed_seconds": 15.77,
+          "phase": "Live write/product shift",
+          "completed": 67,
+          "achieved_rps": 2.87,
+          "configured_rps": 5.0,
+          "dropped": 11
+        },
+        {
+          "elapsed_seconds": 16.8,
+          "phase": "Live write/product shift",
+          "completed": 68,
+          "achieved_rps": 0.97,
+          "configured_rps": 5.0,
+          "dropped": 11
+        },
+        {
+          "elapsed_seconds": 17.81,
+          "phase": "Live write/product shift",
+          "completed": 72,
+          "achieved_rps": 3.94,
+          "configured_rps": 5.0,
+          "dropped": 11
+        },
+        {
+          "elapsed_seconds": 18.83,
+          "phase": "Live write/product shift",
+          "completed": 75,
+          "achieved_rps": 2.96,
+          "configured_rps": 5.0,
+          "dropped": 11
+        },
+        {
+          "elapsed_seconds": 19.92,
+          "phase": "Live write/product shift",
+          "completed": 80,
+          "achieved_rps": 4.57,
+          "configured_rps": 5.0,
+          "dropped": 12
+        },
+        {
+          "elapsed_seconds": 20.92,
+          "phase": "Live write/product shift",
+          "completed": 82,
+          "achieved_rps": 2.0,
+          "configured_rps": 5.0,
+          "dropped": 14
+        },
+        {
+          "elapsed_seconds": 21.94,
+          "phase": "Live write/product shift",
+          "completed": 86,
+          "achieved_rps": 3.94,
+          "configured_rps": 5.0,
+          "dropped": 17
+        },
+        {
+          "elapsed_seconds": 23.03,
+          "phase": "Live write/product shift",
+          "completed": 88,
+          "achieved_rps": 1.83,
+          "configured_rps": 5.0,
+          "dropped": 17
+        },
+        {
+          "elapsed_seconds": 24.03,
+          "phase": "Live write/product shift",
+          "completed": 91,
+          "achieved_rps": 3.0,
+          "configured_rps": 5.0,
+          "dropped": 18
+        },
+        {
+          "elapsed_seconds": 25.11,
+          "phase": "Live write/product shift",
+          "completed": 92,
+          "achieved_rps": 0.93,
+          "configured_rps": 5.0,
+          "dropped": 21
+        },
+        {
+          "elapsed_seconds": 26.2,
+          "phase": "Live write/product shift",
+          "completed": 98,
+          "achieved_rps": 5.49,
+          "configured_rps": 5.0,
+          "dropped": 22
+        },
+        {
+          "elapsed_seconds": 27.27,
+          "phase": "Live write/product shift",
+          "completed": 100,
+          "achieved_rps": 1.88,
+          "configured_rps": 5.0,
+          "dropped": 22
+        },
+        {
+          "elapsed_seconds": 28.31,
+          "phase": "Live write/product shift",
+          "completed": 107,
+          "achieved_rps": 6.69,
+          "configured_rps": 5.0,
+          "dropped": 24
+        },
+        {
+          "elapsed_seconds": 29.36,
+          "phase": "Live write/product shift",
+          "completed": 118,
+          "achieved_rps": 10.51,
+          "configured_rps": 5.0,
+          "dropped": 26
+        },
+        {
+          "elapsed_seconds": 30.38,
+          "phase": "Live write/product shift",
+          "completed": 123,
+          "achieved_rps": 4.93,
+          "configured_rps": 5.0,
+          "dropped": 28
+        },
+        {
+          "elapsed_seconds": 31.44,
+          "phase": "Live write/product shift",
+          "completed": 128,
+          "achieved_rps": 4.7,
+          "configured_rps": 5.0,
+          "dropped": 31
+        },
+        {
+          "elapsed_seconds": 32.45,
+          "phase": "Live write/product shift",
+          "completed": 131,
+          "achieved_rps": 2.96,
+          "configured_rps": 5.0,
+          "dropped": 31
+        },
+        {
+          "elapsed_seconds": 33.55,
+          "phase": "Live write/product shift",
+          "completed": 134,
+          "achieved_rps": 2.74,
+          "configured_rps": 5.0,
+          "dropped": 34
+        },
+        {
+          "elapsed_seconds": 34.61,
+          "phase": "Live write/product shift",
+          "completed": 136,
+          "achieved_rps": 1.88,
+          "configured_rps": 5.0,
+          "dropped": 35
+        },
+        {
+          "elapsed_seconds": 35.7,
+          "phase": "Live write/product shift",
+          "completed": 137,
+          "achieved_rps": 0.91,
+          "configured_rps": 5.0,
+          "dropped": 39
+        },
+        {
+          "elapsed_seconds": 36.78,
+          "phase": "Live write/product shift",
+          "completed": 139,
+          "achieved_rps": 1.86,
+          "configured_rps": 5.0,
+          "dropped": 40
+        }
+      ],
+      "phase_events": [
+        {
+          "name": "Customer reads",
+          "elapsed_seconds": 0,
+          "source": "plan"
+        },
+        {
+          "name": "Live write/product shift",
+          "elapsed_seconds": 3.094,
+          "source": "live"
+        }
+      ],
+      "average_latency_ms": 5.77,
+      "write_budget_reached": true
+    },
+    "created_at_utc": "2026-10-29T04:51:25.130000Z",
+    "updated_at_utc": "2026-10-29T04:52:02.208000Z",
+    "controls": [
+      {
+        "phase": {
+          "name": "Live write/product shift",
+          "duration_seconds": 40,
+          "requests_per_second": 5.0,
+          "customer_read": 0.0,
+          "product_read": 70.0,
+          "insert": 15.0,
+          "update": 15.0,
+          "hot_key_percent": 80.0,
+          "hot_customer_id": 1,
+          "hot_product_id": 1
+        },
+        "created_at_utc": "2026-10-29T04:51:28.167000Z"
+      }
+    ]
+  }
+}

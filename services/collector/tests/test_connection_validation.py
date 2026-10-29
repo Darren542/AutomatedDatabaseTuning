@@ -106,3 +106,13 @@ def test_cursor_cleanup_error_does_not_prevent_connection_close():
     result = ConnectionValidationService(connect).validate(target())
     assert result.connected
     connection.close.assert_called_once()
+
+
+def test_elevated_permissions_are_a_warning_when_all_telemetry_reads_succeed():
+    connect,connection,cursor=driver()
+    cursor.fetchone.side_effect=[(1,),(1,)]
+    result=ConnectionValidationService(connect).validate(target())
+    assert result.code==ValidationCode.EXCESSIVE_PERMISSIONS
+    assert result.connected and result.collector_ready
+    assert result.ddl_restricted is False
+    connection.close.assert_called_once()

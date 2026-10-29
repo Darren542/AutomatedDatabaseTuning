@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { toRequest, testConnection } from './targets.js'
+import { toRequest, testConnection, canSaveTarget } from './targets.js'
 
 const form = { name: 'Demo', server: 'localhost', database: 'Demo', authentication: 'windows', username: 'private', password: 'secret', connection_timeout_seconds: '5', query_timeout_seconds: '6' }
 test('Windows request omits credentials; numeric inputs become numbers', () => {
@@ -36,4 +36,15 @@ test('unreadable and validation responses do not disclose raw bodies', async () 
 test('success uses the explicit connected flag', async () => {
   const result = await testConnection(form, undefined, async () => ({ ok: true, status: 200, json: async () => ({ connected: true, code: 'connected' }) }))
   assert.equal(result.connected, true)
+})
+
+test('elevated permissions require acknowledgement without bypassing readiness', () => {
+  const ready={connected:true,collector_ready:true,ddl_restricted:false}
+  assert.equal(canSaveTarget(ready),false)
+  assert.equal(canSaveTarget(ready,true),true)
+  assert.equal(canSaveTarget({...ready,collector_ready:false},true),false)
+  assert.equal(canSaveTarget({...ready,connected:false},true),false)
+  assert.equal(canSaveTarget({...ready,ddl_restricted:true}),true)
+  assert.equal(canSaveTarget({...ready,ddl_restricted:true},false,true),false)
+  assert.equal(canSaveTarget({...ready,ddl_restricted:true},true,true),true)
 })

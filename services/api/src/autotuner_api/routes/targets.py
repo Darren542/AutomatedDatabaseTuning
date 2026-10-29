@@ -63,6 +63,7 @@ class TestConnectionRequest(TargetConfigurationRequest):
 
 
 class SaveTargetRequest(TargetConfigurationRequest):
+    acknowledge_excessive_permissions: bool = False
     credential_reference: str | None = Field(
         default=None,
         max_length=200,
@@ -200,8 +201,11 @@ def save_target(
         validate_authentication(target, credentials)
     except (TargetCredentialError, TargetConfigurationError) as error:
         raise HTTPException(status_code=422, detail="Configure the credential reference on the API server before saving a SQL target.") from None
-    if not service.validate(target, credentials).collector_ready:
-        raise HTTPException(status_code=422, detail="Target is not collector-ready. Check connectivity, telemetry permissions, and DDL restrictions.")
+    result = service.validate(target, credentials)
+    if not result.collector_ready:
+        raise HTTPException(status_code=422, detail="Target is not collector-ready. Check connectivity and required telemetry permissions.")
+    if not result.ddl_restricted and not request.acknowledge_excessive_permissions:
+        raise HTTPException(status_code=428, detail="This account can alter database objects. Acknowledge the excessive-permissions warning to save this target.")
 
     try:
         record = repository.create(

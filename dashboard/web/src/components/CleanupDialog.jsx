@@ -1,0 +1,15 @@
+import React,{useEffect,useState} from 'react'
+import {request} from '../api/client.js'
+
+const labels={collections:'Collections',candidate_sets:'Candidate sets',analyses:'Analysis results',simulation_runs:'Simulation runs',targets:'Target configurations',query_memberships:'Query evidence links',query_rows_to_remove:'Unshared query records',CollectionSourceState:'Source snapshots',CollectionComponentResult:'Collection source results',IndexUsageObservation:'Index usage observations',IndexOperationalObservation:'Index operational observations',MissingIndexObservation:'Missing-index observations',TableMetadataSnapshot:'Schema table definitions',ColumnMetadataSnapshot:'Schema column definitions',IndexMetadataSnapshot:'Index definitions',IndexColumnMetadataSnapshot:'Index-column definitions',ConstraintMetadataSnapshot:'Constraint definitions'}
+
+export default function CleanupDialog({item,onClose,onDeleted}) {
+  const [preview,setPreview]=useState(null),[confirmation,setConfirmation]=useState(''),[error,setError]=useState(''),[busy,setBusy]=useState(false)
+  const path=`/cleanup/${item.kind}/${item.id}`
+  useEffect(()=>{const c=new AbortController();request(`${path}/preview?delete_target=${!!item.deleteTarget}`,{signal:c.signal}).then(setPreview).catch(e=>{if(e.name!=='AbortError')setError(e.message)});return()=>c.abort()},[path,item.deleteTarget])
+  async function remove(){setBusy(true);setError('');try{await request(path,{method:'DELETE',body:{confirmation,preview_token:preview.preview_token,delete_target:!!item.deleteTarget},errors:{409:'Cleanup is blocked by active work, or the preview has changed. Stop active jobs and reopen the preview.'}});onDeleted()}catch(e){setError(e.message)}finally{setBusy(false)}}
+  return <div className="dialog-backdrop"><section role="dialog" aria-modal="true" aria-labelledby="cleanup-title" className="card cleanup-dialog"><div className="card-head"><h2 id="cleanup-title">{item.deleteTarget?'Delete target and repository history':item.kind==='targets'?'Clear collected target data':'Delete collection'}</h2><button className="secondary" disabled={busy} onClick={onClose}>Close</button></div><div className="card-body">
+    {error&&<p role="alert" className="notice error">{error}</p>}
+    {preview?<><p>{preview.note}</p><dl className="provenance">{Object.entries(preview.counts).filter(([,count])=>count>0).map(([key,count])=><React.Fragment key={key}><dt>{labels[key]||key}</dt><dd>{count}</dd></React.Fragment>)}</dl><p className="notice warning">This permanently removes repository records. It does not drop a database, remove target tables, or undo simulator writes.</p><label className="field"><span>Type exactly: {preview.confirmation}</span><input aria-label="Cleanup confirmation" value={confirmation} onChange={e=>setConfirmation(e.target.value)} autoComplete="off"/></label><button className="danger" disabled={busy||preview.blocked||confirmation!==preview.confirmation} onClick={remove}>{busy?'Deleting…':'Permanently delete listed records'}</button></>:!error&&<p>Loading deletion preview…</p>}
+  </div></section></div>
+}

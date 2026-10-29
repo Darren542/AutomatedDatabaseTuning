@@ -1,7 +1,7 @@
 const messages = {
   connected: 'Connection and collector permissions validated.',
   insufficient_permissions: 'Connected, but required collector permissions are missing.',
-  excessive_permissions: 'Connected, but this account can perform DDL. Use a restricted collector account.',
+  excessive_permissions: 'Connected, but this account can perform DDL. A restricted account is recommended; you can acknowledge the warning and continue.',
   authentication_failed: 'Authentication failed. Check the authentication mode and database account access.',
   timeout: 'The connection test timed out. Check the server address or adjust the timeout.',
   connection_failed: 'Could not connect. Check the instance name, network access, and certificate settings.',
@@ -36,4 +36,10 @@ export async function testConnection(form, signal, fetcher = fetch) {
   }
   // Display known messages only; never echo raw response text or submitted secrets.
   return { connected: result.connected, message: messages[result.code] }
+}
+
+
+export function canSaveTarget(result, acknowledged = false, saveWarning = false) {
+  return result?.connected === true && result.collector_ready === true &&
+    ((!saveWarning && result.ddl_restricted === true) || acknowledged === true)
 }

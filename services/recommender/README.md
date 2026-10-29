@@ -1,16 +1,15 @@
-# Recommender service (POC)
+# Recommendation service
 
-Generates index recommendations from:
-- Missing index DMVs (as hints)
-- Observed top-cost queries (from feature store)
+Generates advisory CREATE/RETAIN/DROP recommendations from persisted collector evidence. Includes deterministic scoring, conservative protection rules and append-only analysis snapshots. No target tuning SQL is executed.
 
-Produces:
-- A ranked list of CREATE INDEX recommendations
-- A SQL file under `reports/` (optional) to apply in the demo
+Install all local packages together and apply repository migration 005. See [Sprint 2 setup, rules and API](../../docs/SPRINT_2_IMPLEMENTATION.md), [task backlog](../../docs/SPRINT_2_BACKLOG.md) and [acceptance demonstration](../../docs/SPRINT_2_ACCEPTANCE.md).
 
-## Run
-1) Copy `.env.example` → `.env` in repo root and fill in values.
-2) Install deps:
-   - `pip install -e services/recommender`
-3) Run:
-   - `autotuner-recommender`
+From the repository root:
+
+```powershell
+services\collector\.venv\Scripts\autotuner-recommender.exe --batch-id <collection-UUID>
+```
+
+## Candidate sets and scoring runs
+
+Discovery now persists unscored candidate sets; scoring reuses their frozen inputs with selected weights. See [workflow instructions](../../docs/WORKFLOW_AND_SIMULATOR.md). Earlier analyses can supply saved evidence without rescanning.

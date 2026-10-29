@@ -11,7 +11,7 @@ class CollectionBusyError(ValueError):
 
 @contextmanager
 def target_collection_lock(target_id: UUID):
-    resource = f"autotuner:collection:{target_id}"
+    resource = f"autotuner:collection:{UUID(str(target_id))}"
     with repository_connection() as connection:
         cursor = connection.cursor()
         try:

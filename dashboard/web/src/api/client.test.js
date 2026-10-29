@@ -24,3 +24,11 @@ test('collection payload is sent as JSON to the versioned endpoint', async () =>
   try { assert.equal((await request('/collections',{method:'POST',body:{force_metadata:true}})).status,'Pending') }
   finally {globalThis.fetch=original}
 })
+
+test('cancelling response-body parsing remains an abort instead of a UI error', async () => {
+  const original=globalThis.fetch
+  const aborted=Object.assign(new Error('Cancelled'),{name:'AbortError'})
+  globalThis.fetch=async()=>({ok:true,json:async()=>{throw aborted}})
+  try { await assert.rejects(request('/candidate-sets'),{name:'AbortError'}) }
+  finally {globalThis.fetch=original}
+})

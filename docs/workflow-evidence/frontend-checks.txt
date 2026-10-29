@@ -1,0 +1,105 @@
+
+> autotuner-dashboard@0.1.0 test
+> node --test src/api/targets.test.js src/api/client.test.js src/api/recommendations.test.js
+
+TAP version 13
+# Subtest: UTC repository timestamps never become browser-local instants
+ok 1 - UTC repository timestamps never become browser-local instants
+  ---
+  duration_ms: 3.9019
+  ...
+# Subtest: failed repository responses never echo arbitrary server text
+ok 2 - failed repository responses never echo arbitrary server text
+  ---
+  duration_ms: 0.6908
+  ...
+# Subtest: collection payload is sent as JSON to the versioned endpoint
+ok 3 - collection payload is sent as JSON to the versioned endpoint
+  ---
+  duration_ms: 0.2688
+  ...
+# Subtest: cancelling response-body parsing remains an abort instead of a UI error
+ok 4 - cancelling response-body parsing remains an abort instead of a UI error
+  ---
+  duration_ms: 0.67
+  ...
+# Subtest: action and status filters preserve backend rank order
+ok 5 - action and status filters preserve backend rank order
+  ---
+  duration_ms: 3.595
+  ...
+# Subtest: search matches table/index names and cannot expose hidden actions
+ok 6 - search matches table/index names and cannot expose hidden actions
+  ---
+  duration_ms: 0.1582
+  ...
+# Subtest: small measured write pressure is not displayed as zero
+ok 7 - small measured write pressure is not displayed as zero
+  ---
+  duration_ms: 19.5924
+  ...
+# Subtest: Windows request omits credentials; numeric inputs become numbers
+ok 8 - Windows request omits credentials; numeric inputs become numbers
+  ---
+  duration_ms: 1.5399
+  ...
+# Subtest: SQL request preserves password whitespace only inside credentials
+ok 9 - SQL request preserves password whitespace only inside credentials
+  ---
+  duration_ms: 0.7774
+  ...
+# Subtest: failed connection with HTTP 200 remains a failure and ignores raw message
+ok 10 - failed connection with HTTP 200 remains a failure and ignores raw message
+  ---
+  duration_ms: 0.3587
+  ...
+# Subtest: malformed, contradictory, and unknown responses are not treated as success
+ok 11 - malformed, contradictory, and unknown responses are not treated as success
+  ---
+  duration_ms: 0.8705
+  ...
+# Subtest: unreadable and validation responses do not disclose raw bodies
+ok 12 - unreadable and validation responses do not disclose raw bodies
+  ---
+  duration_ms: 0.5341
+  ...
+# Subtest: success uses the explicit connected flag
+ok 13 - success uses the explicit connected flag
+  ---
+  duration_ms: 0.3516
+  ...
+1..13
+# tests 13
+# suites 0
+# pass 13
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 143.0626
+
+> autotuner-dashboard@0.1.0 build
+> vite build
+
+vite v5.4.21 building for production...
+transforming...
+✓ 38 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.41 kB │ gzip:  0.27 kB
+dist/assets/index-BpgIp4hp.css   15.69 kB │ gzip:  4.39 kB
+dist/assets/index-HUp0uhHn.js   208.73 kB │ gzip: 64.04 kB
+✓ built in 870ms
+
+> autotuner-dashboard@0.1.0 build
+> vite build
+
+vite v5.4.21 building for production...
+transforming...
+✓ 38 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.41 kB │ gzip:  0.28 kB
+dist/assets/index-BpgIp4hp.css   15.69 kB │ gzip:  4.39 kB
+dist/assets/index-DmLk0szi.js   208.75 kB │ gzip: 64.04 kB
+✓ built in 865ms
