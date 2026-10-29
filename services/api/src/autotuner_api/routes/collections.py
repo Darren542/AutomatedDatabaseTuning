@@ -1,8 +1,8 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from collector.collection.coordinator import (
     CollectionCoordinator,
@@ -14,6 +14,9 @@ from collector.repository.collection_batches import SqlCollectionBatchRepository
 from collector.repository.component_results import SqlComponentResultRepository
 from collector.repository.models import CollectionBatchRecord, CollectionBatchStatus
 
+from autotuner_api.utc import UTCResponse, as_utc
+from collector.repository.collection_lock import target_collection_lock
+
 router = APIRouter(prefix="/collections", tags=["collections"])
 
 class CreateCollectionRequest(BaseModel):
@@ -24,6 +27,11 @@ class CreateCollectionRequest(BaseModel):
     requested_window_start_utc: datetime | None = None
     requested_window_end_utc: datetime | None = None
     force_metadata: bool = False
+
+    @field_validator("requested_window_start_utc", "requested_window_end_utc")
+    @classmethod
+    def normalize_window(cls, value):
+        return as_utc(value) if value is not None else value
 
     @model_validator(mode="after")
     def validate_window(self):
@@ -41,9 +49,12 @@ class CreateCollectionRequest(BaseModel):
                 "requested_window_start_utc must be <= requested_window_end_utc."
             )
 
+        if end is not None and end > datetime.now(timezone.utc):
+            raise ValueError("Historical collection windows must not end in the future.")
+
         return self
 
-class CollectionResponse(BaseModel):
+class CollectionResponse(UTCResponse):
     batch_id: UUID
     target_id: UUID
     label: str | None
@@ -62,7 +73,7 @@ class CollectionResponse(BaseModel):
     created_at_utc: datetime
     updated_at_utc: datetime
 
-class CollectionRunResponse(BaseModel):
+class CollectionRunResponse(UTCResponse):
     batch_id: UUID
     final_status: CollectionBatchStatus
     completeness_percent: float
@@ -73,7 +84,7 @@ class CollectionRunResponse(BaseModel):
     effective_window_end_utc: datetime
     window_source: str
 
-class ComponentResultResponse(BaseModel):
+class ComponentResultResponse(UTCResponse):
     component_name: str
     status: str
     rows_collected: int | None
@@ -83,14 +94,14 @@ class ComponentResultResponse(BaseModel):
     error_message: str | None
     status_message: str | None
 
-class SourceStateSummaryResponse(BaseModel):
+class SourceStateSummaryResponse(UTCResponse):
     observed_at_utc: datetime
     sql_server_start_time_utc: datetime | None
     query_store_actual_state: str | None
     dmv_reset_detected: bool
     query_store_reset_detected: bool
 
-class EvidenceCountResponse(BaseModel):
+class EvidenceCountResponse(UTCResponse):
     query_runtime_rows: int
     index_usage_rows: int
     index_operational_rows: int
@@ -102,7 +113,7 @@ class EvidenceCountResponse(BaseModel):
     constraint_metadata_rows: int
     metadata_rows: int
 
-class QueryRuntimeSummaryResponse(BaseModel):
+class QueryRuntimeSummaryResponse(UTCResponse):
     runtime_evidence_rows: int
     execution_count: int
     total_duration_ms: float
@@ -111,7 +122,7 @@ class QueryRuntimeSummaryResponse(BaseModel):
     logical_writes: float
     physical_reads: float
 
-class CollectionSummaryResponse(BaseModel):
+class CollectionSummaryResponse(UTCResponse):
     batch: CollectionResponse
     source_state: SourceStateSummaryResponse | None
     component_statuses: dict[str, str]
@@ -185,6 +196,8 @@ def list_collections(
     limit: int = Query(default=100, ge=1, le=500),
     repository: SqlCollectionBatchRepository = Depends(get_batch_repository),
 ) -> list[CollectionResponse]:
+    if created_from_utc and created_to_utc and as_utc(created_from_utc) > as_utc(created_to_utc):
+        raise HTTPException(status_code=422, detail="Creation start must be before end.")
     return [
         _response(batch)
         for batch in repository.list(
@@ -200,7 +213,10 @@ def list_collections(
 def get_collection_components(
     batch_id: UUID,
     repository: SqlComponentResultRepository = Depends(get_component_repository),
+    batches: SqlCollectionBatchRepository = Depends(get_batch_repository),
 ) -> list[ComponentResultResponse]:
+    if batches.get(batch_id) is None:
+        raise HTTPException(status_code=404, detail="Collection not found.")
     return [
         ComponentResultResponse(**row)
         for row in repository.list(batch_id)
@@ -255,5 +271,18 @@ def collect_batch(
         )
     except KeyError as error:
         raise HTTPException(status_code=404, detail=str(error)) from None
+    except ValueError as error:
+        raise HTTPException(status_code=409, detail=str(error)) from None
+
+
+@router.post("/{batch_id}/cancel", response_model=CollectionResponse)
+def cancel_inactive_collection(batch_id: UUID, repository=Depends(get_batch_repository)):
+    batch = repository.get(batch_id)
+    if batch is None:
+        raise HTTPException(status_code=404, detail="Collection not found.")
+    try:
+        with target_collection_lock(batch.target_id):
+            return _response(repository.transition(batch_id, CollectionBatchStatus.CANCELLED,
+                failure_reason="Cancelled by operator; create a new batch to retry."))
     except ValueError as error:
         raise HTTPException(status_code=409, detail=str(error)) from None

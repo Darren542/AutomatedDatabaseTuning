@@ -12,7 +12,7 @@ from collector.connection_validation import ConnectionValidationResult, Validati
 @pytest.fixture
 def api():
     service = Mock()
-    service.validate.return_value = ConnectionValidationResult(ValidationCode.CONNECTED, "Connected.")
+    service.validate.return_value = ConnectionValidationResult(ValidationCode.CONNECTED, "Connected.", database_connected=True, query_store_readable=True, index_usage_readable=True, metadata_readable=True, ddl_restricted=True, source_state_readable=True, index_operational_readable=True, missing_indexes_readable=True)
     app = create_app(Settings())
     app.dependency_overrides[get_validation_service] = lambda: service
     with TestClient(app) as client:
@@ -27,7 +27,8 @@ def test_windows_request_maps_to_domain_and_returns_only_result(api):
     client, service = api
     response = client.post("/api/v1/targets/test-connection", json=payload(trust_server_certificate=True))
     assert response.status_code == 200
-    assert response.json() == {"connected": True, "code": "connected", "message": "Connected."}
+    assert response.json()["collector_ready"] is True
+    assert response.json()["code"] == "connected"
     target, credentials = service.validate.call_args.args
     assert target.server == r"localhost\SQLEXPRESS"
     assert target.trust_server_certificate is True
@@ -78,12 +79,14 @@ def test_connection_failures_are_completed_tests_not_success(api, code):
     service.validate.return_value = ConnectionValidationResult(code, "Safe failure message.")
     response = client.post("/api/v1/targets/test-connection", json=payload())
     assert response.status_code == 200
-    assert response.json() == {"connected": False, "code": code.value, "message": "Safe failure message."}
+    assert response.json()["connected"] is False
+    assert response.json()["code"] == code.value
 
 
 def test_endpoint_does_not_implement_saving_and_openapi_describes_password(api):
     client, _ = api
-    assert client.post("/api/v1/targets", json=payload()).status_code == 404
+    schema = client.get("/openapi.json").json()
+    assert "post" in schema["paths"]["/api/v1/targets"]
     schema = client.get("/openapi.json").json()
     password = schema["components"]["schemas"]["CredentialsRequest"]["properties"]["password"]
     assert password["writeOnly"] is True

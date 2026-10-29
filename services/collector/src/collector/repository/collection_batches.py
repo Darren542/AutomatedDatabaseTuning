@@ -321,16 +321,17 @@ class SqlCollectionBatchRepository:
                         CollectionCompletedAtUtc = {completed_expression},
                         UpdatedAtUtc = SYSUTCDATETIME()
                     OUTPUT {_output_columns()}
-                    WHERE BatchId = ?;
+                    WHERE BatchId = ? AND Status = ?;
                     """,
                     new_status.value,
                     completeness_percent,
                     failure_reason,
                     str(batch_id),
+                    current.status.value,
                 ).fetchone()
 
                 if row is None:
-                    raise CollectionBatchNotFoundError(str(batch_id))
+                    raise ValueError("Collection state changed. Refresh and try again.")
 
                 connection.commit()
                 return _record(row)

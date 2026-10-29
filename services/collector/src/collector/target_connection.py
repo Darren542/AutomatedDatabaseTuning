@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import os
+from pathlib import Path
+from dotenv import dotenv_values
+from collector.targets import SqlCredentials
 from contextlib import contextmanager
 from typing import Iterator
 
@@ -20,8 +23,9 @@ def _odbc_value(value: str) -> str:
 
 def _credentials(reference: str) -> tuple[str, str]:
     prefix = reference.strip().upper()
-    username = os.getenv(f"{prefix}_SQL_USERNAME")
-    password = os.getenv(f"{prefix}_SQL_PASSWORD")
+    values = {**dotenv_values(Path.cwd() / ".env"), **os.environ}
+    username = values.get(f"{prefix}_SQL_USERNAME")
+    password = values.get(f"{prefix}_SQL_PASSWORD")
     if not username or not password:
         raise TargetCredentialError(f"Credential reference {reference!r} is not configured.")
     return username, password
@@ -55,8 +59,13 @@ def open_target_connection(target: TargetRecord) -> Iterator[pyodbc.Connection]:
         timeout=config.connection_timeout_seconds,
         autocommit=True,
     )
-    connection.timeout = config.query_timeout_seconds
     try:
+        connection.timeout = config.query_timeout_seconds
         yield connection
     finally:
         connection.close()
+
+
+def resolve_credentials(reference: str) -> SqlCredentials:
+    username, password = _credentials(reference)
+    return SqlCredentials(username, password)

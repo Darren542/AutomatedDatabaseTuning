@@ -67,6 +67,7 @@ class SqlEvidenceRepository:
             TargetId
             + RuntimeStatsIntervalId
             + RuntimeStatsId
+            + IntervalStartUtc (protects history when Query Store IDs reset)
 
         The EvidenceId is always looked up using that canonical key after the
         upsert. We intentionally do not use SCOPE_IDENTITY(), because an existing
@@ -126,7 +127,8 @@ class SqlEvidenceRepository:
 
                         WHERE TargetId = ?
                         AND RuntimeStatsIntervalId = ?
-                        AND RuntimeStatsId = ?;
+                        AND RuntimeStatsId = ?
+                        AND IntervalStartUtc = ?;
                         """,
                         item.plan_id,
                         item.query_id,
@@ -158,6 +160,7 @@ class SqlEvidenceRepository:
                         str(target_id),
                         item.runtime_stats_interval_id,
                         item.runtime_stats_id,
+                        item.interval_start_utc,
                     )
 
                     # If UPDATE matched nothing, this is new canonical evidence.
@@ -252,11 +255,13 @@ class SqlEvidenceRepository:
                         FROM dbo.QueryStoreRuntimeEvidence
                         WHERE TargetId = ?
                         AND RuntimeStatsIntervalId = ?
-                        AND RuntimeStatsId = ?;
+                        AND RuntimeStatsId = ?
+                        AND IntervalStartUtc = ?;
                         """,
                         str(target_id),
                         item.runtime_stats_interval_id,
                         item.runtime_stats_id,
+                        item.interval_start_utc,
                     ).fetchone()
 
                     if evidence_row is None:

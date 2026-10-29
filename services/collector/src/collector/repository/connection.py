@@ -4,12 +4,16 @@ from __future__ import annotations
 
 import os
 from contextlib import contextmanager
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Iterator
 
 import pyodbc
 from dotenv import dotenv_values
+
+
+def _odbc_value(value: str) -> str:
+    return "{" + value.replace("}", "}}") + "}"
 
 
 @dataclass(frozen=True)
@@ -20,7 +24,7 @@ class RepositorySettings:
     trusted_connection: bool
     trust_server_certificate: bool
     username: str | None = None
-    password: str | None = None
+    password: str | None = field(default=None, repr=False)
 
     @classmethod
     def load(cls, env_file: Path | None = None) -> "RepositorySettings":
@@ -71,8 +75,8 @@ class RepositorySettings:
     def to_connection_string(self) -> str:
         parts = [
             f"DRIVER={{{self.driver}}}",
-            f"SERVER={{{self.server}}}",
-            f"DATABASE={{{self.database}}}",
+            "SERVER=" + _odbc_value(self.server),
+            "DATABASE=" + _odbc_value(self.database),
             "Encrypt=yes",
             (
                 "TrustServerCertificate=yes"
@@ -85,8 +89,8 @@ class RepositorySettings:
         if self.username is not None and self.password is not None:
             parts.extend(
                 [
-                    f"UID={{{self.username}}}",
-                    f"PWD={{{self.password}}}",
+                    "UID=" + _odbc_value(self.username),
+                    "PWD=" + _odbc_value(self.password),
                 ]
             )
         elif self.trusted_connection:
@@ -108,8 +112,10 @@ def repository_connection(
     connection = pyodbc.connect(
         effective.to_connection_string(),
         autocommit=False,
+        timeout=10,
     )
     try:
+        connection.timeout = 60
         yield connection
     finally:
         connection.close()

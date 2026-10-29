@@ -13,7 +13,7 @@ def target(**overrides):
 
 def driver():
     cursor = Mock()
-    cursor.fetchone.return_value = (1,)
+    cursor.fetchone.side_effect = [(1,), (0,)]
     connection = Mock()
     connection.cursor.return_value = cursor
     connect = Mock(return_value=connection)
@@ -26,7 +26,7 @@ def test_success_binds_database_sets_both_timeouts_and_closes_resources():
     assert result.connected
     assert connect.call_args.kwargs == {"timeout": 3, "autocommit": True}
     assert connection.timeout == 4
-    cursor.execute.assert_called_once_with("SELECT CASE WHEN DB_ID(?) = DB_ID() THEN 1 ELSE 0 END", "Demo")
+    assert cursor.execute.call_args_list[0].args == ("SELECT CASE WHEN DB_ID(?) = DB_ID() THEN 1 ELSE 0 END", "Demo")
     cursor.close.assert_called_once()
     connection.close.assert_called_once()
     text = connect.call_args.args[0]
@@ -76,6 +76,7 @@ def test_driver_errors_are_safe_results(state, code, caplog):
 @pytest.mark.parametrize("row", [None, (0,)])
 def test_wrong_database_is_not_success(row):
     connect, connection, cursor = driver()
+    cursor.fetchone.side_effect = None
     cursor.fetchone.return_value = row
     result = ConnectionValidationService(connect).validate(target())
     assert result.code == ValidationCode.DATABASE_UNAVAILABLE

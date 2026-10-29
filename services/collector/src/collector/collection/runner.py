@@ -23,6 +23,7 @@ from collector.repository.collection_state import SqlTargetCollectionStateReposi
 from collector.repository.component_results import SqlComponentResultRepository
 from collector.repository.evidence import SqlEvidenceRepository
 from collector.repository.models import CollectionBatchStatus
+from collector.repository.collection_lock import target_collection_lock
 from collector.repository.targets import SqlTargetRepository
 from collector.target_connection import open_target_connection
 
@@ -71,23 +72,30 @@ class CollectionRunner:
         batch = self._batches.get(batch_id)
         if batch is None:
             raise KeyError("Collection batch not found.")
+        with target_collection_lock(batch.target_id):
+            return self._collect_locked(batch_id)
+
+    def _collect_locked(self, batch_id: UUID) -> CollectionRunResult:
+        batch = self._batches.get(batch_id)
+        if batch is None:
+            raise KeyError("Collection batch not found.")
 
         if batch.status == CollectionBatchStatus.PENDING:
             batch = self._batches.transition(
                 batch_id,
                 CollectionBatchStatus.COLLECTING,
             )
-        elif batch.status != CollectionBatchStatus.COLLECTING:
+        else:
             raise ValueError(
                 f"Collection cannot run from status {batch.status.value}."
             )
 
         target = self._targets.get(batch.target_id)
-        if target is None:
+        if target is None or not target.is_enabled:
             self._batches.transition(
                 batch_id,
                 CollectionBatchStatus.FAILED,
-                failure_reason="Target no longer exists.",
+                failure_reason="Target no longer exists or is disabled.",
             )
             raise KeyError("Target not found.")
 
@@ -309,7 +317,7 @@ class CollectionRunner:
                 )
 
         except Exception as error:
-            logger.exception(
+            logger.error(
                 "Collection batch %s failed outside an individual component",
                 batch_id,
             )
@@ -399,7 +407,7 @@ class CollectionRunner:
             return value
 
         except Exception as error:
-            logger.exception("Collection component %s failed", name)
+            logger.error("Collection component %s failed", name)
 
             try:
                 self._components.fail(
@@ -412,7 +420,7 @@ class CollectionRunner:
                     ),
                 )
             except Exception:
-                logger.exception(
+                logger.error(
                     "Could not persist Failed status for component %s",
                     name,
                 )

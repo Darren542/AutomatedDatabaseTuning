@@ -37,6 +37,9 @@ class ConnectionValidationResult:
     index_usage_readable: bool = False
     metadata_readable: bool = False
     ddl_restricted: bool = False
+    source_state_readable: bool = False
+    index_operational_readable: bool = False
+    missing_indexes_readable: bool = False
 
     @property
     def connected(self) -> bool:
@@ -50,6 +53,9 @@ class ConnectionValidationResult:
             and self.index_usage_readable
             and self.metadata_readable
             and self.ddl_restricted
+            and self.source_state_readable
+            and self.index_operational_readable
+            and self.missing_indexes_readable
         )
 
 
@@ -213,8 +219,13 @@ class ConnectionValidationService:
                 """,
             )
 
+            source_state_readable = _can_execute(cursor, "SELECT TOP (1) sqlserver_start_time FROM sys.dm_os_sys_info;")
+            index_operational_readable = _can_execute(cursor, "SELECT TOP (1) object_id FROM sys.dm_db_index_operational_stats(DB_ID(), NULL, NULL, NULL);")
+            missing_indexes_readable = _can_execute(cursor, "SELECT TOP (1) group_handle FROM sys.dm_db_missing_index_group_stats;")
+            metadata_readable = metadata_readable and _can_execute(cursor, "SELECT TOP (1) object_id FROM sys.dm_db_partition_stats;")
+
             cursor.execute(
-                "SELECT HAS_PERMS_BY_NAME(DB_NAME(), 'DATABASE', 'ALTER');"
+                "SELECT CASE WHEN HAS_PERMS_BY_NAME(DB_NAME(), 'DATABASE', 'ALTER') = 0 AND NOT EXISTS (SELECT 1 FROM sys.tables WHERE HAS_PERMS_BY_NAME(QUOTENAME(SCHEMA_NAME(schema_id)) + '.' + QUOTENAME(name), 'OBJECT', 'ALTER') = 1) THEN 0 ELSE 1 END;"
             )
             alter_row = cursor.fetchone()
             ddl_restricted = alter_row is not None and not bool(alter_row[0])
@@ -223,6 +234,9 @@ class ConnectionValidationService:
                 query_store_readable
                 and index_usage_readable
                 and metadata_readable
+                and source_state_readable
+                and index_operational_readable
+                and missing_indexes_readable
             ):
                 return ConnectionValidationResult(
                     ValidationCode.INSUFFICIENT_PERMISSIONS,
@@ -235,6 +249,9 @@ class ConnectionValidationService:
                     index_usage_readable=index_usage_readable,
                     metadata_readable=metadata_readable,
                     ddl_restricted=ddl_restricted,
+                    source_state_readable=source_state_readable,
+                    index_operational_readable=index_operational_readable,
+                    missing_indexes_readable=missing_indexes_readable,
                 )
 
             if not ddl_restricted:
@@ -250,6 +267,9 @@ class ConnectionValidationService:
                     index_usage_readable=True,
                     metadata_readable=True,
                     ddl_restricted=False,
+                    source_state_readable=True,
+                    index_operational_readable=True,
+                    missing_indexes_readable=True,
                 )
 
             return ConnectionValidationResult(
@@ -260,6 +280,9 @@ class ConnectionValidationService:
                 index_usage_readable=True,
                 metadata_readable=True,
                 ddl_restricted=True,
+                source_state_readable=True,
+                index_operational_readable=True,
+                missing_indexes_readable=True,
             )
 
         except pyodbc.Error as error:

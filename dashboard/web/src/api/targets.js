@@ -1,5 +1,7 @@
 const messages = {
-  connected: 'Connection to the selected database succeeded.',
+  connected: 'Connection and collector permissions validated.',
+  insufficient_permissions: 'Connected, but required collector permissions are missing.',
+  excessive_permissions: 'Connected, but this account can perform DDL. Use a restricted collector account.',
   authentication_failed: 'Authentication failed. Check the authentication mode and database account access.',
   timeout: 'The connection test timed out. Check the server address or adjust the timeout.',
   connection_failed: 'Could not connect. Check the instance name, network access, and certificate settings.',
@@ -29,7 +31,7 @@ export async function testConnection(form, signal, fetcher = fetch) {
   let result
   try { result = await response.json() } catch { throw new Error('The API returned an unreadable response. Check that the backend is running.') }
   if (!result || typeof result.connected !== 'boolean' || !Object.hasOwn(messages, result.code) ||
-      result.connected !== (result.code === 'connected')) {
+      result.connected !== ['connected', 'insufficient_permissions', 'excessive_permissions'].includes(result.code)) {
     throw new Error('The API returned an unexpected response. Try again after checking the backend.')
   }
   // Display known messages only; never echo raw response text or submitted secrets.

@@ -5,11 +5,11 @@ Run the commands below in PowerShell from the repository root. Python 3.10 or ne
 ## Install and run the API
 
 ```powershell
-python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -e "services/collector[dev]" -e "services/api[dev]"
+python -m venv services/collector/.venv
+services\collector\.venv\Scripts\python.exe -m pip install -e "services/collector[dev]" -e "services/api[dev]"
 # Optional: copy only if .env does not already exist.
 if (-not (Test-Path .env)) { Copy-Item .env.example .env }
-.\.venv\Scripts\python.exe -m autotuner_api
+services\collector\.venv\Scripts\python.exe -m autotuner_api
 ```
 
 Open http://127.0.0.1:8080/api/v1/health or http://127.0.0.1:8080/docs. Stop with Ctrl+C. The installed `autotuner-api` command is an equivalent entry point.
@@ -19,7 +19,7 @@ Settings are read from `.env` in the launch directory; environment variables ove
 ## Backend checks
 
 ```powershell
-.\.venv\Scripts\python.exe -m pytest services/api/tests
+services\collector\.venv\Scripts\python.exe -m pytest services/api/tests
 ```
 
 These tests exercise HTTP responses and configuration without SQL Server. They are not browser E2E tests.
@@ -41,12 +41,16 @@ Use the URL printed by Vite. The dashboard now provides target configuration and
 The original runner remains separate and requires the configured SQL Server test database, an ODBC driver, and its own dependencies:
 
 ```powershell
-.\.venv\Scripts\python.exe -m pip install -r services/autorunner/requirements_poc_runner.txt
-.\.venv\Scripts\python.exe services/autorunner/autotuner_poc_runner.py --help
+services\collector\.venv\Scripts\python.exe -m pip install -r services/autorunner/requirements_poc_runner.txt
+services\collector\.venv\Scripts\python.exe services/autorunner/autotuner_poc_runner.py --help
 ```
 
 Consult the autorunner README and database-specific setup scripts before running an experiment. The demo can clear Query Store and apply/drop indexes; starting the new API does none of those operations. Existing Compose files are prototype scaffolding and do not launch the new API.
 
 ## FR-01 collector validation
 
-Install the backend validation package with `.\.venv\Scripts\python.exe -m pip install -e "services/collector[dev]"`. See [Target validation](TARGET_VALIDATION.md) for tests and an optional manual database connection check. The API exposes health and Test Connection endpoints. See [Target API](TARGET_API.md) for the HTTP check.
+Install the backend validation package with `services\collector\.venv\Scripts\python.exe -m pip install -e "services/collector[dev]"`. See [Target validation](TARGET_VALIDATION.md) for tests and an optional manual database connection check. The API exposes health and Test Connection endpoints. See [Target API](TARGET_API.md) for the HTTP check.
+
+## Full project workspace
+
+See [Project frontend and collector completion](PROJECT_FRONTEND.md) for repository migration 004, the complete UI, and collector recovery.

@@ -16,6 +16,8 @@ from collector.connection_validation import (
 )
 from collector.repository.models import TargetRecord
 from collector.repository.targets import SqlTargetRepository
+from collector.target_connection import resolve_credentials, TargetCredentialError
+
 from collector.targets import (
     SqlCredentials,
     TargetConfiguration,
@@ -76,6 +78,9 @@ class TestConnectionResponse(BaseModel):
     index_usage_readable: bool
     metadata_readable: bool
     ddl_restricted: bool
+    source_state_readable: bool
+    index_operational_readable: bool
+    missing_indexes_readable: bool
 
 
 class TargetResponse(BaseModel):
@@ -177,6 +182,9 @@ def test_connection(
         index_usage_readable=result.index_usage_readable,
         metadata_readable=result.metadata_readable,
         ddl_restricted=result.ddl_restricted,
+        source_state_readable=result.source_state_readable,
+        index_operational_readable=result.index_operational_readable,
+        missing_indexes_readable=result.missing_indexes_readable,
     )
 
 
@@ -184,8 +192,16 @@ def test_connection(
 def save_target(
     request: SaveTargetRequest,
     repository: SqlTargetRepository = Depends(get_target_repository),
+    service: ConnectionValidationService = Depends(get_validation_service),
 ) -> TargetResponse:
     target = _target_configuration(request)
+    try:
+        credentials = resolve_credentials(request.credential_reference) if target.authentication.value == "sql" and request.credential_reference else None
+        validate_authentication(target, credentials)
+    except (TargetCredentialError, TargetConfigurationError) as error:
+        raise HTTPException(status_code=422, detail="Configure the credential reference on the API server before saving a SQL target.") from None
+    if not service.validate(target, credentials).collector_ready:
+        raise HTTPException(status_code=422, detail="Target is not collector-ready. Check connectivity, telemetry permissions, and DDL restrictions.")
 
     try:
         record = repository.create(
@@ -220,3 +236,20 @@ def get_target(
     if record is None:
         raise HTTPException(status_code=404, detail="Target not found.")
     return _response(record)
+
+
+@router.post("/{target_id}/test-connection", response_model=TestConnectionResponse)
+def test_saved_target(target_id: UUID, repository=Depends(get_target_repository), service=Depends(get_validation_service)):
+    record = repository.get(target_id)
+    if record is None:
+        raise HTTPException(status_code=404, detail="Target not found.")
+    try:
+        credentials = resolve_credentials(record.credential_reference) if record.configuration.authentication.value == "sql" else None
+    except (TargetCredentialError, AttributeError):
+        raise HTTPException(status_code=422, detail="The target credential reference is not configured on the API server.") from None
+    result = service.validate(record.configuration, credentials)
+    return TestConnectionResponse(connected=result.connected, collector_ready=result.collector_ready,
+        code=result.code, message=result.message, query_store_readable=result.query_store_readable,
+        index_usage_readable=result.index_usage_readable, metadata_readable=result.metadata_readable,
+        ddl_restricted=result.ddl_restricted, source_state_readable=result.source_state_readable,
+        index_operational_readable=result.index_operational_readable, missing_indexes_readable=result.missing_indexes_readable)

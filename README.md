@@ -83,3 +83,7 @@ This repository is a **proof-of-concept** for an automated tuning loop on **SQL 
 ## Full implementation foundation
 
 The new API starts independently of the preserved SQL prototype. See [Local development](docs/LOCAL_DEVELOPMENT.md) for current startup commands and [Application structure](docs/APPLICATION_STRUCTURE.md) for component ownership and migration boundaries. The earlier quick-start section describes the legacy scaffold.
+
+## Current project application
+
+The full project frontend now connects saved targets, collection execution, component progress, and workload history. Other tuning modules have planned workspaces. Follow [Project frontend and collector completion](docs/PROJECT_FRONTEND.md) for startup, SQL migration 004, and the optional restricted-collector setup.
